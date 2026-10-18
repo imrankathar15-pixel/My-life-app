@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="app-version" content="2026-10-18.2">
+<meta name="theme-color" content="#2f6f5e">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="My Life">
+<link rel="apple-touch-icon" href="icon-192.png">
+<title>My Life Dashboard</title>
+<style>
+:root{--bg:#f6f5f1;--card:#fff;--ink:#1c1b19;--mute:#76736b;--line:#e6e3dc;--acc:#2f6f5e;--accbg:#e3f0ec;--warn:#b4472f;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#151513;--card:#201f1c;--ink:#efede7;--mute:#9b978c;--line:#34322d;--acc:#6cc2aa;--accbg:#22342f;--warn:#e58a72;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#151513;--card:#201f1c;--ink:#efede7;--mute:#9b978c;--line:#34322d;--acc:#6cc2aa;--accbg:#22342f;--warn:#e58a72;color-scheme:dark}
+*{box-sizing:border-box}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.4 system-ui,-apple-system,"Segoe UI",sans-serif}
+main{max-width:980px;margin:0 auto;padding:16px 14px 40px}
+header{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;margin-bottom:14px}
+h1{font:600 24px/1.15 Georgia,serif;margin:0}
+.sub{color:var(--mute);font-size:13px;margin-top:2px}
+.stats{display:flex;gap:8px}
+.st{background:var(--accbg);color:var(--acc);border-radius:10px;padding:6px 10px;font-size:12px;text-align:center;font-weight:600}
+.st b{display:block;font-size:17px}
+.grid{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(290px,1fr))}
+.c{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px}
+.c h2{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--mute);margin:0 0 10px;font-weight:600}
+.row{display:flex;align-items:center;gap:10px;padding:7px 0;border-top:1px solid var(--line)}
+.row:first-of-type{border-top:0}
+.row .t{flex:1;min-width:0;overflow-wrap:anywhere}
+.row.done .t{text-decoration:line-through;color:var(--mute)}
+.chk{width:22px;height:22px;border-radius:7px;border:2px solid var(--line);background:none;cursor:pointer;flex:none;color:#fff;font-size:13px;padding:0}
+.chk.on{background:var(--acc);border-color:var(--acc)}
+.x{background:none;border:0;color:var(--mute);cursor:pointer;font-size:18px;padding:2px 6px}
+.add{display:flex;gap:6px;margin-top:10px}
+input{flex:1;min-width:0;padding:8px 10px;border:1px solid var(--line);border-radius:9px;background:var(--bg);color:var(--ink);font:inherit}
+button.b{background:var(--acc);color:var(--bg);border:0;border-radius:9px;padding:8px 12px;font:inherit;font-weight:600;cursor:pointer}
+.meta{font-size:12px;color:var(--mute)}
+.over{color:var(--warn)}
+.streak{font-size:12px;color:var(--acc);font-weight:600;white-space:nowrap}
+.bar{height:8px;background:var(--line);border-radius:5px;overflow:hidden;margin-top:4px}
+.bar i{display:block;height:100%;background:var(--acc)}
+.mini{display:flex;gap:4px}
+.mini button{border:1px solid var(--line);background:none;color:var(--ink);border-radius:7px;padding:2px 8px;cursor:pointer;font:inherit;font-size:12px}
+.cal{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;text-align:center}
+.cal .h{font-size:11px;color:var(--mute)}
+.d{aspect-ratio:1;border:0;background:none;color:var(--ink);border-radius:9px;cursor:pointer;font:inherit;font-size:13px;position:relative;padding:0}
+.d.today{outline:1.5px solid var(--acc)}
+.d.sel{background:var(--acc);color:var(--bg)}
+.d.dot::after{content:"";position:absolute;bottom:4px;left:50%;width:4px;height:4px;margin-left:-2px;border-radius:50%;background:var(--warn)}
+.cn{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;font-weight:600}
+.cn button{background:none;border:1px solid var(--line);color:var(--ink);border-radius:8px;width:32px;height:28px;cursor:pointer}
+.empty{color:var(--mute);font-size:13px;padding:4px 0}
+.wide{grid-column:1/-1}
+.sec{font:600 22px Georgia,serif;margin:28px 0 12px}
+select{flex:1;min-width:0;padding:8px;border:1px solid var(--line);border-radius:9px;background:var(--bg);color:var(--ink);font:inherit}
+.nx{color:var(--acc);font-weight:600}
+.ar{display:block;font-size:20px;line-height:1.6;font-family:"Geeza Pro","Noto Naskh Arabic","Traditional Arabic",serif}
+.cnt{border:1px solid var(--acc);background:none;color:var(--acc);border-radius:999px;padding:3px 11px;font:inherit;font-size:13px;font-weight:600;cursor:pointer;min-width:62px}
+.cnt.full{background:var(--acc);color:var(--bg)}
+.tabs{display:flex;gap:6px;margin:0 0 14px;background:var(--line);padding:4px;border-radius:12px}
+.tabs button{flex:1;border:0;background:none;color:var(--mute);padding:8px;border-radius:9px;font:inherit;font-weight:600;cursor:pointer}
+.tabs button.on{background:var(--card);color:var(--ink)}
+.chip{border:1px solid var(--line);background:none;color:var(--ink);border-radius:999px;padding:5px 11px;font:inherit;font-size:13px;cursor:pointer}
+.chip.on{background:var(--acc);border-color:var(--acc);color:var(--bg)}
+.ring{display:flex;align-items:center;gap:14px}
+.cmp{flex:1;display:grid;gap:5px;font-size:13px;color:var(--mute)}
+.cmp div{display:flex;justify-content:space-between}
+.tag{font-size:11px;background:var(--accbg);color:var(--acc);border-radius:6px;padding:1px 6px;margin-left:6px}
+.when{width:78px;flex:none;font-size:12px;font-weight:600;color:var(--acc)}
+.tabs{overflow-x:auto;scrollbar-width:none}
+.tabs button{flex:1 0 auto;white-space:nowrap;padding:8px 12px}
+.fl{display:flex;flex-direction:column;flex:1 1 120px;font-size:11px;color:var(--mute)}
+.when.over{color:var(--warn)}
+</style>
+</head>
+<body>
+<main>
+<header>
+<div><h1 id="hi">Hello</h1><div class="sub" id="dt"></div></div>
+<div class="stats" id="stats"></div>
+</header>
+<div id="ubar"></div>
+<nav class="tabs"><button data-a="pg" data-i="glance">Today</button><button data-a="pg" data-i="life">My Life</button><button data-a="pg" data-i="plan">Planner &amp; Islamic</button><button data-a="pg" data-i="money">Money</button><button data-a="pg" data-i="health">Health</button><button data-a="pg" data-i="docs">Documents</button><button data-a="pg" data-i="grow">Growth</button><button data-a="pg" data-i="trip">Travel</button><button data-a="pg" data-i="dates">Dates</button></nav>
+<div class="grid" id="pgx"></div>
+<div class="grid" id="life"></div>
+<div class="grid" id="app"></div>
+<h2 class="sec" id="secI">Islamic daily companion</h2>
+<div class="grid" id="isl"></div>
+</main>
+<script>
+const K='mydash_v1';
+let S=null;
+try{S=JSON.parse(localStorage.getItem(K))}catch(e){}
+S=Object.assign({prio:[],habits:[],rem:[],shop:[],goals:[],ev:[],ram:[],isl:{loc:{lat:13.0827,lng:80.2707},m:'Karachi',h:0,adh:{d:'',c:{}},q:{p:0,goal:5,log:{},khatm:0},rs:'2027-02-08',fast:{}}},S||{});
+let sel=ymd(new Date()),view=new Date(),focus=null,pg='glance';
+function save(){try{localStorage.setItem(K,JSON.stringify(S))}catch(e){}}
+function ymd(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')}
+const today=()=>ymd(new Date());
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const $=id=>document.getElementById(id);
+const fmt=d=>new Date(d+'T00:00').toLocaleDateString(undefined,{month:'short',day:'numeric'});
+
+function streak(h){let d=new Date(),n=0;if(!h.days[ymd(d)])d.setDate(d.getDate()-1);while(h.days[ymd(d)]){n++;d.setDate(d.getDate()-1)}return n}
+function chk(on,a,k,i){return `<button class="chk ${on?'on':''}" data-a="${a}" data-k="${k}" data-i="${i}" aria-label="toggle">${on?'✓':''}</button>`}
+function del(k,i){return `<button class="x" data-a="del" data-k="${k}" data-i="${i}" aria-label="delete">×</button>`}
+function addRow(k,ph,extra=''){return `<div class="add"><input id="in-${k}" data-k="${k}" placeholder="${ph}">${extra}<button class="b" data-a="add" data-k="${k}">Add</button></div>`}
+function card(t,b,cls=''){return `<section class="c ${cls}"><h2>${t}</h2>${b}</section>`}
+function list(k,arr,empty){return arr.length?arr.map((x,i)=>`<div class="row ${x.done?'done':''}">${chk(x.done,'tog',k,i)}<span class="t">${esc(x.t)}</span>${del(k,i)}</div>`).join(''):`<div class="empty">${empty}</div>`}
+
+function render(){
+  const h=new Date().getHours();
+  $('hi').textContent=(h<12?'Good morning':h<18?'Good afternoon':'Good evening')+'.';
+  $('dt').textContent=new Date().toLocaleDateString(undefined,{weekday:'long',month:'long',day:'numeric'});
+  const t=today(),pd=S.prio.filter(x=>x.done).length,hd=S.habits.filter(x=>x.days[t]).length;
+  $('stats').innerHTML=`<div class="st"><b>${pd}/${S.prio.length}</b>priorities</div><div class="st"><b>${hd}/${S.habits.length}</b>habits</div>`;
+
+  const prio=card('Today’s priorities',list('prio',S.prio,'Pick up to three things that matter most today.')+(S.prio.length<3?addRow('prio','What matters today?'):''));
+
+  const hab=card('Habits',(S.habits.length?S.habits.map((x,i)=>`<div class="row">${chk(x.days[t],'hab','habits',i)}<span class="t">${esc(x.t)}</span><span class="streak">${streak(x)?streak(x)+'d 🔥':''}</span>${del('habits',i)}</div>`).join(''):'<div class="empty">Add a daily habit to start a streak.</div>')+addRow('habits','New habit'));
+
+  const rs=S.rem.map((x,i)=>({...x,i})).sort((a,b)=>(a.done-b.done)||((a.d||'9')>(b.d||'9')?1:-1));
+  const rem=card('Reminders',(rs.length?rs.map(x=>`<div class="row ${x.done?'done':''}">${chk(x.done,'tog','rem',x.i)}<span class="t">${esc(x.t)}${x.d?`<div class="meta ${!x.done&&x.d<t?'over':''}">${x.d<t&&!x.done?'Overdue · ':''}${fmt(x.d)}</div>`:''}</span>${del('rem',x.i)}</div>`).join(''):'<div class="empty">Nothing to remember. Nice.</div>')+addRow('rem','Remind me to…','<input id="in-rem-d" type="date" style="flex:none;width:130px">'));
+
+  const y=view.getFullYear(),m=view.getMonth(),first=new Date(y,m,1).getDay(),dim=new Date(y,m+1,0).getDate();
+  const marks=new Set([...S.ev.map(e=>e.d),...S.rem.filter(r=>!r.done&&r.d).map(r=>r.d)]);
+  let cells=['S','M','T','W','T','F','S'].map(d=>`<div class="h">${d}</div>`).join('')+'<div></div>'.repeat(first);
+  for(let d=1;d<=dim;d++){const s=ymd(new Date(y,m,d));cells+=`<button class="d ${s===t?'today':''} ${s===sel?'sel':''} ${marks.has(s)?'dot':''}" data-a="day" data-i="${s}">${d}</button>`}
+  const evs=S.ev.map((e,i)=>({...e,i})).filter(e=>e.d===sel),rd=S.rem.filter(r=>r.d===sel&&!r.done);
+  const cal=card('Calendar',`<div class="cn"><button data-a="mo" data-i="-1">‹</button><span>${view.toLocaleDateString(undefined,{month:'long',year:'numeric'})}</span><button data-a="mo" data-i="1">›</button></div><div class="cal">${cells}</div><div style="margin-top:12px"><div class="meta">${fmt(sel)}</div>${evs.map(e=>`<div class="row"><span class="t">${esc(e.t)}</span>${del('ev',e.i)}</div>`).join('')}${rd.map(r=>`<div class="row"><span class="t">⏰ ${esc(r.t)}</span></div>`).join('')}${!evs.length&&!rd.length?'<div class="empty">Nothing scheduled.</div>':''}</div>`+addRow('ev','Add event on '+fmt(sel)),'wide');
+
+  const shop=card('Shopping list',list('shop',S.shop,'List is empty.')+addRow('shop','Add item')+(S.shop.some(x=>x.done)?'<div style="margin-top:8px"><button class="mini-b x" data-a="clr" style="font-size:13px">Clear checked</button></div>':''));
+
+  const goals=card('Goals',(S.goals.length?S.goals.map((g,i)=>`<div class="row" style="align-items:flex-start"><span class="t"><b>${esc(g.t)}</b> <span class="meta">${g.p}%</span><div class="bar"><i style="width:${g.p}%"></i></div></span><span class="mini"><button data-a="goal" data-i="${i}" data-n="-10">−</button><button data-a="goal" data-i="${i}" data-n="10">+10</button></span>${del('goals',i)}</div>`).join(''):'<div class="empty">What are you working toward?</div>')+addRow('goals','New goal'));
+
+  $('app').innerHTML=pg==='plan'?prio+hab+rem+cal+shop+goals:'';renderI();renderL();renderX();
+  if(focus&&$(focus)){$(focus).focus();}
+}
+
+document.addEventListener('click',e=>{
+  const b=e.target.closest('[data-a]');if(!b)return;
+  const a=b.dataset.a,k=b.dataset.k,i=b.dataset.i;focus=null;
+  if(a==='add'){
+    const inp=$('in-'+k),v=inp.value.trim();if(!v)return;
+    if(k==='prio')S.prio.push({t:v,done:false});
+    else if(k==='habits')S.habits.push({t:v,days:{}});
+    else if(k==='rem')S.rem.push({t:v,d:$('in-rem-d').value||'',done:false});
+    else if(k==='shop')S.shop.push({t:v,done:false});
+    else if(k==='goals')S.goals.push({t:v,p:0});
+    else if(k==='ev')S.ev.push({t:v,d:sel});
+    else if(k==='ram')S.ram.push({t:v,done:false});
+    else if(k==='qt')S.rem.push({t:v,d:today(),done:false});
+    focus='in-'+k;
+  }
+  else if(a==='tog')S[k][i].done=!S[k][i].done;
+  else if(a==='del')S[k].splice(i,1);
+  else if(a==='hab'){const d=S.habits[i].days,t=today();d[t]?delete d[t]:d[t]=true}
+  else if(a==='goal')S.goals[i].p=Math.max(0,Math.min(100,S.goals[i].p+Number(b.dataset.n)));
+  else if(a==='day')sel=i;
+  else if(a==='mo')view=new Date(view.getFullYear(),view.getMonth()+Number(i),1);
+  else if(a==='pg'){pg=i;scrollTo(0,0)}
+  else if(a==='ga'){const f=b.dataset.f,o={};let ok=true;F[f].forEach(([c,ph,ty,op,rq],j)=>{let v=$('g:'+k+':'+c).value;if(ty==='number')v=v===''?0:+v;if((j===0||rq)&&!v)ok=false;o[c]=v});if(!ok)return;Object.assign(o,DF[f]?DF[f]():{});let ar=get(k);if(!ar)set(k,ar=[]);ar.push(o);if(f==='trip')ti=ar.length-1;focus='g:'+k+':'+F[f][0][0]}
+  else if(a==='gd'){get(k).splice(i,1);if(k==='tr.list')ti=0}
+  else if(a==='tgl')set(k,!get(k));
+  else if(a==='upd'){chkUpd(1);return}
+  else if(a==='applyu'){(async()=>{try{for(const c of await caches.keys())await caches.delete(c);const r=await navigator.serviceWorker.getRegistration();if(r)await r.unregister()}catch(e){}location.reload()})();return}
+  else if(a==='bkr'){$('bkfile').click();return}
+  else if(a==='bkf'){const f=new File([JSON.stringify(S)],'mylife-backup-'+today()+'.json',{type:'application/json'});if(navigator.canShare&&navigator.canShare({files:[f]}))navigator.share({files:[f],title:'My Life backup'}).catch(()=>{});else{const l=document.createElement('a');l.href=URL.createObjectURL(f);l.download=f.name;l.click()}bkMsg='Pick Zoho WorkDrive in the share sheet, or find the file in Downloads and upload it to Zoho.'}
+  else if(a==='inc'){let v=Math.max(0,(+get(k)||0)+(+b.dataset.n));if(+b.dataset.m)v=Math.min(+b.dataset.m,v);set(k,v)}
+  else if(a==='ti')ti=+i;
+  else if(a==='dcat')dcat=i;
+  else if(a==='dtf')dtf=i;
+  else if(a==='exp'){bkText=JSON.stringify(S);bkMsg='Backup created. Copy it into a secure note or password manager.';try{navigator.clipboard.writeText(bkText)}catch(e){}}
+  else if(a==='imp'){try{const o=JSON.parse($('bk').value);if(!o||!o.isl)throw 0;S=o;initX();bkText='';bkMsg='Backup restored.'}catch(e){bkMsg='That does not look like a valid backup.'}}
+  else if(a==='geo'){if(navigator.geolocation)navigator.geolocation.getCurrentPosition(p=>{S.isl.loc={lat:+p.coords.latitude.toFixed(3),lng:+p.coords.longitude.toFixed(3)};save();render()},()=>{$('lmsg').textContent='Location unavailable here. Enter coordinates instead.'});return}
+  else if(a==='setloc'){const la=parseFloat($('lat').value),lo=parseFloat($('lng').value);if(!(Math.abs(la)<=66&&Math.abs(lo)<=180))return;S.isl.loc={lat:la,lng:lo}}
+  else if(a==='cmp'){compass();return}
+  else if(a==='adh'){const c=S.isl.adh.c,n=AD[i][2];c[i]=(c[i]||0)>=n?0:(c[i]||0)+1}
+  else if(a==='qp'){const q=S.isl.q,t=today();let n=+b.dataset.n;if(n<0)n=-Math.min(-n,q.p);q.p+=n;q.log[t]=Math.max(0,(q.log[t]||0)+n);if(q.p>=604){q.p-=604;q.khatm++}}
+  else if(a==='fast'){const f=S.isl.fast;f[i]?delete f[i]:f[i]=true}
+  else if(a==='clr')S.shop=S.shop.filter(x=>!x.done);
+  save();render();
+});
+document.addEventListener('keydown',e=>{
+  if(e.key==='Enter'&&e.target.dataset&&e.target.dataset.k){const b=document.querySelector(`button[data-a="add"][data-k="${e.target.dataset.k}"]`);if(b)b.click()}
+});
+const M={Karachi:[18,18],MWL:[18,17],ISNA:[15,15],Egypt:[19.5,17.5],'Umm al-Qura':[18.5,0]};
+const R=Math.PI/180,sn=a=>Math.sin(a*R),cs=a=>Math.cos(a*R),tn=a=>Math.tan(a*R),as=x=>Math.asin(x)/R,ac=x=>Math.acos(x)/R,fx=(a,b)=>a-b*Math.floor(a/b);
+function jdn(y,m,d){if(m<=2){y--;m+=12}const A=Math.floor(y/100);return Math.floor(365.25*(y+4716))+Math.floor(30.6001*(m+1))+d+2-A+Math.floor(A/4)-1524.5}
+function sp(j){const D=j-2451545,g=fx(357.529+.98560028*D,360),q=fx(280.459+.98564736*D,360),L=fx(q+1.915*sn(g)+.02*sn(2*g),360),e=23.439-3.6e-7*D,RA=fx(Math.atan2(cs(e)*sn(L),cs(L))/R,360)/15;return{d:as(sn(e)*sn(L)),q:fx(q/15-RA+12,24)-12}}
+function ptimes(dt,lat,lng,m,han){
+ const J=jdn(dt.getFullYear(),dt.getMonth()+1,dt.getDate())-lng/360,tz=-dt.getTimezoneOffset()/60;
+ const mid=h=>fx(12-sp(J+h/24).q,24);
+ const an=(a,h,ccw)=>{const d=sp(J+h/24).d,v=(-sn(a)-sn(d)*sn(lat))/(cs(d)*cs(lat));if(Math.abs(v)>1)return NaN;const x=ac(v)/15;return mid(h)+(ccw?-x:x)};
+ let t={fajr:5,sunrise:6,dhuhr:12,asr:13,maghrib:18,isha:19};
+ for(let i=0;i<2;i++){const p=t,d=sp(J+p.asr/24).d,v=(sn(Math.atan(1/(1+han+tn(Math.abs(lat-d))))/R)-sn(d)*sn(lat))/(cs(d)*cs(lat));
+  t={fajr:an(M[m][0],p.fajr,1),sunrise:an(.833,p.sunrise,1),dhuhr:mid(p.dhuhr),asr:mid(p.asr)+ac(v)/15,maghrib:an(.833,p.maghrib,0)};
+  t.isha=M[m][1]?an(M[m][1],p.isha,0):t.maghrib+1.5}
+ for(const k in t)t[k]=fx(t[k]+tz-lng/15,24);
+ return t}
+const fm=h=>{if(isNaN(h))return '--';h=fx(h+.5/60,24);const H=Math.floor(h),mn=Math.floor((h-H)*60);return ((H+11)%12+1)+':'+String(mn).padStart(2,'0')+' '+(H<12?'AM':'PM')};
+const qibla=(lat,lng)=>{const p=lat*R,k=21.4225*R,dl=(39.8262-lng)*R;return fx(Math.atan2(Math.sin(dl),Math.cos(p)*Math.tan(k)-Math.sin(p)*Math.cos(dl))/R,360)};
+let PT=null,hd=0;
+function updNext(){if(!PT)return;const n=new Date(),h=n.getHours()+n.getMinutes()/60,o=['fajr','dhuhr','asr','maghrib','isha'];let k=o.find(x=>PT[x]>h),dh;if(k)dh=PT[k]-h;else{k='fajr';dh=PT.fajr+24-h}
+ const e=$('nextp')||$('nextp2');if(!e||isNaN(dh))return;const H=Math.floor(dh),mn=Math.round((dh-H)*60);e.textContent='Next: '+k[0].toUpperCase()+k.slice(1)+' in '+(H?H+'h ':'')+mn+'m';o.forEach(x=>$('pr-'+x)&&$('pr-'+x).classList.toggle('nx',x===k))}
+setInterval(updNext,30000);
+function setH(h){hd=h;const e=$('dial');if(e)e.setAttribute('transform','rotate('+(-h)+' 100 100)')}
+async function compass(){try{if(window.DeviceOrientationEvent&&DeviceOrientationEvent.requestPermission){if(await DeviceOrientationEvent.requestPermission()!=='granted')throw 0}
+ const f=e=>{let h=e.webkitCompassHeading;if(h==null&&(e.absolute||e.type==='deviceorientationabsolute')&&e.alpha!=null)h=fx(360-e.alpha,360);if(h!=null)setH(h)};
+ addEventListener('deviceorientationabsolute',f,true);addEventListener('deviceorientation',f,true);$('cmsg').textContent='Turn until 🕋 points straight up.'}catch(e){$('cmsg').textContent='Compass unavailable here. Use the bearing above with a compass.'}}
+const AD=[['Ayat al-Kursi (2:255)','Morning & evening',1],['Al-Ikhlas, Al-Falaq, An-Nas','Morning & evening',3],['سُبْحَانَ اللّٰهِ وَبِحَمْدِهِ','Subhan Allahi wa bihamdihi · morning & evening',100],['أَسْتَغْفِرُ اللّٰه','Astaghfirullah',100],['Salawat on the Prophet ﷺ','Especially on Friday',10],['سُبْحَانَ اللّٰه','SubhanAllah · after each prayer',33],['الْحَمْدُ لِلّٰه','Alhamdulillah · after each prayer',33],['اللّٰهُ أَكْبَر','Allahu Akbar · after each prayer',34],['Ayat al-Kursi + last 2 verses of Al-Baqarah','Before sleep',1]];
+function renderI(){
+ const I=S.isl,t=today(),L=I.loc,o=(v,l,c)=>`<option value="${v}" ${c?'selected':''}>${l}</option>`;
+ if(I.adh.d!==t)I.adh={d:t,c:{}};
+ PT=ptimes(new Date(),L.lat,L.lng,I.m,I.h);
+ const pr=card('Prayer times','<div id="nextp" style="color:var(--acc);font-weight:600;margin-bottom:4px"></div>'+[['Fajr','fajr'],['Sunrise','sunrise'],['Dhuhr','dhuhr'],['Asr','asr'],['Maghrib','maghrib'],['Isha','isha']].map(([n,k])=>`<div class="row" id="pr-${k}"><span class="t">${n}</span><b>${fm(PT[k])}</b></div>`).join('')
+  +`<div class="add"><input id="lat" type="number" step="any" value="${L.lat}" aria-label="Latitude"><input id="lng" type="number" step="any" value="${L.lng}" aria-label="Longitude"><button class="b" data-a="setloc">Set</button></div>`
+  +`<div class="add"><button class="b" data-a="geo" style="flex:1">Use my location</button></div>`
+  +`<div class="add"><select id="pm" aria-label="Method">${Object.keys(M).map(k=>o(k,k,k===I.m)).join('')}</select><select id="ph" aria-label="Asr">${o(0,'Asr: standard',!I.h)}${o(1,'Asr: Hanafi',I.h)}</select></div><div class="meta" id="lmsg">Starts on Chennai. Times follow this device’s time zone.</div>`);
+ const qb=qibla(L.lat,L.lng);
+ const qi=card('Qibla',`<div style="text-align:center"><svg viewBox="0 0 200 200" width="190" height="190" role="img" aria-label="Qibla compass"><g id="dial"><circle cx="100" cy="100" r="88" fill="none" stroke="var(--line)" stroke-width="2"/><text x="100" y="30" text-anchor="middle" fill="var(--mute)" font-size="13">N</text><g transform="rotate(${qb} 100 100)"><line x1="100" y1="100" x2="100" y2="44" stroke="var(--acc)" stroke-width="3" stroke-linecap="round"/><text x="100" y="40" text-anchor="middle" font-size="20">🕋</text></g></g><path d="M100 4L94 16H106Z" fill="var(--ink)"/></svg><div><b style="font-size:20px">${qb.toFixed(0)}°</b> from North</div><div class="meta" id="cmsg">Dial shows North up. Tap below to align with your phone’s compass.</div><button class="b" data-a="cmp" style="margin-top:8px">Use phone compass</button></div>`);
+ const ad=card('Adhkar',AD.map((x,i)=>{const n=I.adh.c[i]||0,f=n>=x[2];return `<div class="row"><span class="t"><span class="${/[\u0600-\u06FF]/.test(x[0])?'ar':''}">${x[0]}</span><span class="meta">${x[1]}</span></span><button class="cnt ${f?'full':''}" data-a="adh" data-i="${i}">${f?'✓ ':''}${n}/${x[2]}</button></div>`}).join('')+'<div class="meta" style="margin-top:8px">Tap to count. Tap a finished one to reset. Resets daily.</div>');
+ const Q=I.q,td=Q.log[t]||0,fin=fmt(ymd(new Date(Date.now()+Math.ceil((604-Q.p)/Q.goal)*864e5)));
+ const qu=card('Qur’an tracker',`<div class="meta">Page <b>${Q.p}</b> of 604 · Juz ${Q.p?Math.ceil(Q.p/20):0} of 30 · ${Q.khatm} khatm</div><div class="bar"><i style="width:${Q.p/604*100}%"></i></div><div class="row" style="margin-top:8px"><span class="t">Today: <b>${td}</b> / ${Q.goal} pages</span><span class="mini"><button data-a="qp" data-n="-1">−1</button><button data-a="qp" data-n="1">+1</button><button data-a="qp" data-n="5">+5</button></span></div><div class="add"><span class="meta" style="align-self:center;flex:1">Daily goal (pages)</span><input id="qgoal" type="number" min="1" max="100" value="${Q.goal}" style="flex:none;width:70px"></div><div class="meta" style="margin-top:6px">At this pace you finish around ${fin}.</div>`);
+ const dd=Math.round((new Date(I.rs+'T00:00')-new Date(t+'T00:00'))/864e5),cur=dd<=0&&dd>-30?1-dd:0,nf=Object.keys(I.fast).length;
+ const ra=card('Ramadan planner',`<div style="font-size:17px;font-weight:600;color:var(--acc)">${dd>0?dd+' days until Ramadan':cur?'Ramadan day '+cur:'Ramadan has ended'}</div><div class="add"><span class="meta" style="align-self:center">Expected start</span><input id="rs" type="date" value="${I.rs}"></div><div class="meta">Date is approximate. Confirm by moon sighting.</div><div class="row"><span class="t">Suhoor ends (Fajr) <b>${fm(PT.fajr)}</b></span><span class="t" style="text-align:right">Iftar (Maghrib) <b>${fm(PT.maghrib)}</b></span></div><div class="meta" style="margin:8px 0 4px">Fasting tracker · ${nf}/30 · dots mark the odd nights of the last ten (Laylat al-Qadr)</div><div class="cal">${Array.from({length:30},(_,j)=>j+1).map(n=>`<button class="d ${I.fast[n]?'sel':''} ${[21,23,25,27,29].includes(n)?'dot':''} ${n===cur?'today':''}" data-a="fast" data-i="${n}">${n}</button>`).join('')}</div><div class="meta" style="margin:10px 0 4px">Qur’an plan: about 20 pages a day (one juz) completes a khatm in 30 days.</div>${list('ram',S.ram,'Add your Ramadan goals: charity, taraweeh, Qur’an, family iftars.')}${addRow('ram','Add a Ramadan goal')}`,'wide');
+ $('isl').innerHTML=pg==='plan'?pr+qi+ad+qu+ra:'';setH(hd);updNext()}
+document.addEventListener('change',e=>{const i=e.target.id,I=S.isl;if(i==='pm')I.m=e.target.value;else if(i==='ph')I.h=+e.target.value;else if(i==='qgoal')I.q.goal=Math.max(1,Math.min(100,+e.target.value||5));else if(i==='rs'&&e.target.value)I.rs=e.target.value;else return;save();render()});
+function dl(d){const t=today(),n=Math.round((new Date(d+'T00:00')-new Date(t+'T00:00'))/864e5);return n===0?'Today':n===1?'Tomorrow':n<7?new Date(d+'T00:00').toLocaleDateString(undefined,{weekday:'long'}):fmt(d)}
+function renderL(){
+ $('secI').hidden=pg!=='plan';
+ document.querySelectorAll('.tabs button').forEach(b=>b.classList.toggle('on',b.dataset.i===pg));
+ if(pg!=='life'){$('life').innerHTML='';return}
+ const t=today(),I=S.isl,Q=I.q,qd=Q.log[t]||0;
+ $('dt').textContent=$('hi').textContent+' '+$('dt').textContent;$('hi').textContent='My Life Dashboard';
+ const rt=S.rem.map((x,i)=>({...x,i})).filter(x=>x.d?(x.d<=t&&(!x.done||x.d===t)):!x.done);
+ const comp=[['Priorities',S.prio.filter(x=>x.done).length,S.prio.length],['Habits',S.habits.filter(x=>x.days[t]).length,S.habits.length],['Reminders',rt.filter(x=>x.done).length,rt.length],['Qur’an pages',Math.min(qd,Q.goal),Q.goal],['Adhkar',AD.filter((x,i)=>(I.adh.c[i]||0)>=x[2]).length,AD.length]];
+ const act=comp.filter(c=>c[2]>0),pct=Math.round(act.reduce((s,c)=>s+c[1]/c[2],0)/act.length*100);
+ const prog=card('Daily progress',`<div class="ring"><svg viewBox="0 0 80 80" width="96" height="96" role="img" aria-label="${pct}% done"><circle cx="40" cy="40" r="34" fill="none" stroke="var(--line)" stroke-width="8"/><circle cx="40" cy="40" r="34" fill="none" stroke="var(--acc)" stroke-width="8" stroke-linecap="round" stroke-dasharray="${pct*2.136} 213.6" transform="rotate(-90 40 40)"/><text x="40" y="46" text-anchor="middle" font-size="18" font-weight="600" fill="var(--ink)">${pct}%</text></svg><div class="cmp">${comp.map(c=>`<div><span>${c[0]}</span><b style="color:var(--ink)">${c[1]}/${c[2]}</b></div>`).join('')}</div></div>`+(S.habits.length?`<div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:12px">${S.habits.map((h,i)=>`<button class="chip ${h.days[t]?'on':''}" data-a="hab" data-i="${i}">${esc(h.t)}${streak(h)?' · '+streak(h)+'d':''}</button>`).join('')}</div>`:'')+'<div class="meta" style="margin-top:10px"><span id="nextp2"></span></div>');
+ const tasks=card('Today’s tasks',list('prio',S.prio,'Add up to three priorities for today.')+(S.prio.length<3?addRow('prio','What matters today?'):''));
+ const rem=card('Reminders',(rt.length?rt.map(x=>`<div class="row ${x.done?'done':''}">${chk(x.done,'tog','rem',x.i)}<span class="t">${esc(x.t)}${x.d&&x.d<t&&!x.done?'<div class="meta over">Overdue · '+fmt(x.d)+'</div>':''}</span>${del('rem',x.i)}</div>`).join(''):'<div class="empty">All clear.</div>')+addRow('qt','Remind me today…'));
+ const up=[...S.ev.filter(e=>e.d>=t).map(e=>({d:e.d,t:e.t,g:'Event'})),...S.rem.filter(r=>!r.done&&r.d>t).map(r=>({d:r.d,t:r.t,g:'Reminder'}))].sort((a,b)=>a.d>b.d?1:-1).slice(0,6);
+ const upc=card('Upcoming',up.length?up.map(x=>`<div class="row"><span class="when">${dl(x.d)}</span><span class="t">${esc(x.t)}<span class="tag">${x.g}</span></span></div>`).join(''):'<div class="empty">Nothing on the horizon. Add events in the Planner calendar.</div>');
+ const gl=card('Goals',S.goals.length?S.goals.slice(0,4).map((g,i)=>`<div class="row" style="align-items:flex-start"><span class="t"><b>${esc(g.t)}</b> <span class="meta">${g.p}%</span><div class="bar"><i style="width:${g.p}%"></i></div></span><span class="mini"><button data-a="goal" data-i="${i}" data-n="-10">−</button><button data-a="goal" data-i="${i}" data-n="10">+10</button></span></div>`).join(''):'<div class="empty">Add goals in the Planner.</div>');
+ $('life').innerHTML=prog+tasks+rem+upc+gl;updNext()}
+const get=(p,o=S)=>p.split('.').reduce((a,k)=>a==null?a:a[k],o);
+function set(p,v){const k=p.split('.'),l=k.pop();let o=S;for(const x of k){if(o[x]==null)o[x]={};o=o[x]}o[l]=v}
+function initX(){const D={prio:[],habits:[],rem:[],shop:[],goals:[],ev:[],ram:[],fin:{exp:[],gold:[],sg:[],cl:{},efm:6},hl:{day:{},g:{w:8,st:8000,sl:8,ex:30},wt:[],ap:[]},docs:[],gr:{day:{},g:{eng:20,tech:30,rd:20},books:[],co:[],lg:[]},tr:{list:[]},dates:[]};
+ for(const k in D)if(S[k]==null)S[k]=D[k];
+ for(const k of ['fin','hl','gr','tr'])for(const j in D[k])if(S[k][j]==null)S[k][j]=D[k][j]}
+initX();
+let ti=0,dcat='All',dtf='All',bkText='',bkMsg='';
+const CAT=['Food','Rent','Transport','Bills','Shopping','Health','Other'],DC=['Bill','Warranty','Certificate','Insurance','Other'],DT=['Birthday','Anniversary','Bill','Appointment','Renewal','Other'];
+const F={exp:[['t','Expense','text'],['a','Amount \u20b9','number'],['c','Category','select',CAT]],
+gold:[['t','Item (coin, chain\u2026)','text'],['g','Grams','number'],['a','Paid \u20b9','number']],
+sg:[['t','Savings goal','text'],['tg','Target \u20b9','number'],['s','Saved so far \u20b9','number']],
+wt:[['v','Weight (kg)','number']],
+ap:[['t','Appointment','text'],['d','Date','date',0,1]],
+doc:[['t','Document title','text'],['c','Category','select',DC],['e','Renewal / expiry','date'],['l','Where it is kept','text']],
+bk:[['t','Book title','text'],['tp','Total pages','number']],co:[['t','Course name','text']],lg:[['t','Learning goal','text']],
+trip:[['n','Trip name','text'],['s','Start','date'],['e','End','date'],['b','Budget \u20b9','number']],
+tex:[['t','Expense','text'],['a','Amount \u20b9','number']],pk:[['t','Packing item','text']],
+tk:[['t','Ticket / booking','text'],['d','Date','date'],['n','Details','text']],
+it:[['d','Day','date',0,1],['t','Plan','text',0,1]],rm:[['t','Reminder','text'],['d','Due','date',0,1]],
+dt:[['t','Title','text'],['ty','Type','select',DT],['d','Date','date',0,1],['r','Repeat','select',['Auto','Once','Monthly','Yearly']]]};
+const DF={exp:()=>({d:today()}),gold:()=>({d:today()}),wt:()=>({d:today()}),pk:()=>({done:false}),bk:()=>({p:0}),co:()=>({p:0}),lg:()=>({p:0}),trip:()=>({ex:[],pk:[],tk:[],it:[],rm:[],ho:'',hn:''})};
+const rs=n=>'\u20b9'+Math.round(+n||0).toLocaleString('en-IN');
+const wh=d=>{const n=Math.round((new Date(d+'T00:00')-new Date(today()+'T00:00'))/864e5);return n<0?-n+'d overdue':n===0?'Today':n===1?'Tomorrow':'in '+n+'d'};
+const pb=(v,m,w=1)=>`<div class="bar"><i style="width:${m?Math.min(100,v/m*100):0}%;${w&&m&&v>=m*.9?'background:var(--warn)':''}"></i></div>`;
+const bi=(p,ph,ty='number',x='')=>`<input class="bi" data-p="${p}" type="${ty}" step="any" placeholder="${ph}" aria-label="${ph}" value="${esc(get(p)??'')}" ${x}>`;
+const lb=(s,x)=>`<div class="add"><span class="meta" style="align-self:center;flex:1">${s}</span>${x}</div>`;
+const gdb=(p,i)=>`<button class="x" data-a="gd" data-k="${p}" data-i="${i}" aria-label="delete">\u00d7</button>`;
+function gf(p,f,bt='Add'){return `<div class="add" style="flex-wrap:wrap">${F[f].map(([c,ph,ty,op])=>{const id=`g:${p}:${c}`;return ty==='select'?`<select id="${id}" aria-label="${ph}" style="flex:1 1 110px">${op.map(x=>`<option>${x}</option>`).join('')}</select>`:ty==='date'?`<label class="fl"><span>${ph}</span><input id="${id}" type="date"></label>`:`<input id="${id}" type="${ty}" step="any" placeholder="${ph}" aria-label="${ph}" style="flex:1 1 110px">`}).join('')}<button class="b" data-a="ga" data-k="${p}" data-f="${f}">${bt}</button></div>`}
+const last7=()=>[...Array(7)].map((_,j)=>{const d=new Date();d.setDate(d.getDate()-j);return ymd(d)});
+const empty=s=>`<div class="empty">${s}</div>`;
+
+function pgMoney(){
+ const f=S.fin,mo=today().slice(0,7),ex=f.exp.map((e,i)=>({...e,i})).filter(e=>e.d.startsWith(mo)),spt=ex.reduce((s,e)=>s+e.a,0),cat={};
+ ex.forEach(e=>cat[e.c]=(cat[e.c]||0)+e.a);
+ const lim=+f.lim||0,sal=+f.sal||0,basis=lim||spt,left=(lim||sal)-spt;
+ const c1=card('Salary & monthly limit',lb('Monthly salary',bi('fin.sal','\u20b9'))+lb('Monthly spending limit',bi('fin.lim','\u20b9'))
+  +`<div class="row"><span class="t">Spent this month</span><b>${rs(spt)}</b></div><div class="row"><span class="t">${lim?'Left of limit':'Left of salary'}</span><b class="${left<0?'over':''}">${rs(left)}</b></div>`
+  +(sal?`<div class="row"><span class="t">Saving rate</span><b>${Math.round((sal-spt)/sal*100)}%</b></div>`:'')+(lim?pb(spt,lim):''));
+ const c2=card('Expenses & category limits',gf('fin.exp','exp')
+  +CAT.map(c=>`<div class="row"><span class="t">${c}${pb(cat[c]||0,+f.cl[c]||0)}</span><span class="meta">${rs(cat[c]||0)} /</span>${bi('fin.cl.'+c,'limit','number','style="flex:none;width:78px"')}</div>`).join('')
+  +'<div class="meta" style="margin:8px 0 2px">Recent this month</div>'
+  +(ex.length?ex.slice().reverse().slice(0,6).map(e=>`<div class="row"><span class="t">${esc(e.t)}<span class="tag">${e.c}</span></span><b>${rs(e.a)}</b>${gdb('fin.exp',e.i)}</div>`).join(''):empty('No expenses this month.')));
+ const efb=+f.ef||0,tg=basis*(+f.efm||6);
+ const c3=card('Emergency fund',lb('Current balance',bi('fin.ef','\u20b9'))+lb('Target (months of spending)',bi('fin.efm','6'))
+  +`<div class="meta">${basis?`Covers ${(efb/basis).toFixed(1)} months \u00b7 target ${rs(tg)}`:'Set a spending limit or add expenses to size the target.'}</div>`+pb(efb,tg,0));
+ const gg=f.gold.reduce((s,x)=>s+x.g,0),gp=f.gold.reduce((s,x)=>s+x.a,0),gv=gg*(+f.gr||0);
+ const c4=card('Gold purchases',lb('Today\u2019s rate per gram',bi('fin.gr','\u20b9'))
+  +`<div class="row"><span class="t">${gg.toFixed(2)} g bought \u00b7 paid ${rs(gp)}</span><b>${gg?rs(gp/gg)+'/g':''}</b></div>`
+  +(+f.gr&&gg?`<div class="row"><span class="t">Value today ${rs(gv)}</span><b class="${gv<gp?'over':''}" ${gv>=gp?'style="color:var(--acc)"':''}>${gv>=gp?'+':''}${rs(gv-gp)}</b></div>`:'')
+  +gf('fin.gold','gold')+f.gold.map((x,i)=>`<div class="row"><span class="t">${esc(x.t)}<div class="meta">${fmt(x.d)} \u00b7 ${x.g} g</div></span><b>${rs(x.a)}</b>${gdb('fin.gold',i)}</div>`).join(''));
+ const c5=card('Savings goals',gf('fin.sg','sg')+(f.sg.length?f.sg.map((g,i)=>`<div class="row" style="align-items:flex-start"><span class="t"><b>${esc(g.t)}</b> <span class="meta">${rs(g.s)} / ${rs(g.tg)}</span>${pb(g.s,g.tg,0)}</span><span class="mini"><button data-a="inc" data-k="fin.sg.${i}.s" data-n="1000">+1k</button><button data-a="inc" data-k="fin.sg.${i}.s" data-n="10000">+10k</button></span>${gdb('fin.sg',i)}</div>`).join(''):empty('Add a goal like a trip, gold or a home fund.')));
+ return c1+c2+c3+c4+c5}
+
+function pgHealth(){
+ const t=today(),H=S.hl,MT=[['w','Water (glasses)'],['st','Walking (steps)'],['sl','Sleep (hours)'],['ex','Exercise (min)']],dv=(d,k)=>+(H.day[d]&&H.day[d][k])||0;
+ const c1=card('Today',MT.map(([k,n])=>`<div class="row"><span class="t">${n}${pb(dv(t,k),+H.g[k],0)}</span>${bi('hl.day.'+t+'.'+k,'today','number','style="flex:none;width:72px"')}<span class="meta">of</span>${bi('hl.g.'+k,'goal','number','style="flex:none;width:72px"')}</div>`).join('')
+  +`<div class="mini" style="margin-top:8px"><button data-a="inc" data-k="hl.day.${t}.w" data-n="1">+1 glass</button><button data-a="inc" data-k="hl.day.${t}.st" data-n="1000">+1,000 steps</button></div>`);
+ const c2=card('Last 7 days',`<div class="cal" style="grid-template-columns:1.2fr repeat(4,1fr);text-align:right;gap:6px 4px"><div></div>${['Water','Steps','Sleep','Exer.'].map(x=>`<div class="h">${x}</div>`).join('')}${last7().map(d=>`<div style="text-align:left;font-size:13px">${new Date(d+'T00:00').toLocaleDateString(undefined,{weekday:'short'})}</div>`+MT.map(([k])=>{const v=dv(d,k);return `<div style="font-size:13px;${v&&v>=H.g[k]?'color:var(--acc);font-weight:600':''}">${v||'\u2013'}</div>`}).join('')).join('')}</div><div class="meta" style="margin-top:6px">Green means the goal was met.</div>`);
+ const w=H.wt,la=w.slice(-12);let ch='';
+ if(la.length>1){const vs=la.map(x=>x.v),mn=Math.min(...vs),r=Math.max(...vs)-mn||1;ch=`<svg viewBox="0 0 280 70" width="100%" role="img" aria-label="Weight trend"><polyline fill="none" stroke="var(--acc)" stroke-width="2.5" points="${la.map((x,j)=>(8+j*264/(la.length-1))+','+(62-(x.v-mn)/r*54)).join(' ')}"/></svg>`}
+ const wl=w.length?w[w.length-1].v:0,diff=w.length>1?wl-w[0].v:0;
+ const c3=card('Weight history',gf('hl.wt','wt')+(w.length?`<div class="row"><span class="t">Latest <b>${wl} kg</b> \u00b7 ${fmt(w[w.length-1].d)}</span><span class="meta">${w.length>1?(diff>0?'+':'')+diff.toFixed(1)+' kg since first entry':''}</span></div>`:empty('Log your first weight.'))+ch
+  +w.map((x,i)=>({...x,i})).slice(-4).reverse().map(x=>`<div class="row"><span class="t">${fmt(x.d)}</span><b>${x.v} kg</b>${gdb('hl.wt',x.i)}</div>`).join(''));
+ const c4=card('Health appointments',gf('hl.ap','ap')+(H.ap.length?H.ap.map((x,i)=>({...x,i})).sort((a,b)=>a.d>b.d?1:-1).map(x=>`<div class="row"><span class="when ${x.d<t?'over':''}">${wh(x.d)}</span><span class="t">${esc(x.t)}<div class="meta">${fmt(x.d)}</div></span>${gdb('hl.ap',x.i)}</div>`).join(''):empty('No appointments yet.')));
+ return c1+c2+c3+c4}
+
+function pgDocs(){
+ const t=today(),L=S.docs.map((x,i)=>({...x,i})).filter(x=>dcat==='All'||x.c===dcat).sort((a,b)=>(a.e||'9')>(b.e||'9')?1:-1);
+ const c1=card('Documents',`<div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px">${['All',...DC].map(c=>`<button class="chip ${c===dcat?'on':''}" data-a="dcat" data-i="${c}">${c}</button>`).join('')}</div>`+gf('docs','doc')
+  +(L.length?L.map(x=>`<div class="row"><span class="when ${x.e&&x.e<t?'over':''}" style="width:86px">${x.e?wh(x.e):'No date'}</span><span class="t">${esc(x.t)}<span class="tag">${x.c}</span><div class="meta">${x.e?'Renews '+fmt(x.e):''}${x.l?(x.e?' \u00b7 ':'')+'Kept: '+esc(x.l):''}</div></span>${gdb('docs',x.i)}</div>`).join(''):empty('No documents here yet.')),'wide');
+ const c2=card('Security & backup',`<div class="meta" style="margin-bottom:8px">This page keeps only titles, categories, dates and where each document is stored, never the files themselves or any numbers. Keep scans in encrypted storage such as a password manager or encrypted drive, and do not type ID, account or card numbers into notes. Your data lives in this browser only, so back it up regularly. The backup covers the whole dashboard.</div><div class="add"><button class="b" data-a="exp">Create backup</button><button class="b" data-a="imp">Restore</button></div>${IS_APP?`<div class="add"><button class="b" data-a="bkf">Save backup file</button><button class="b" data-a="bkr">Restore from file</button></div><input type="file" id="bkfile" accept=".json,application/json" hidden>`:''}<textarea id="bk" rows="4" placeholder="Backup text appears here. To restore, paste a backup and tap Restore." style="width:100%;margin-top:8px;padding:8px;border:1px solid var(--line);border-radius:9px;background:var(--bg);color:var(--ink);font:12px monospace">${esc(bkText)}</textarea><div class="meta">${bkMsg}</div>`,'wide');
+ return c1+c2+(IS_APP?card('App updates',`<div class="row"><span class="t">Installed version</span><b>${esc(APP_V)}</b></div><div class="add"><button class="b" data-a="upd">Check for updates</button>${newV?'<button class="b" data-a="applyu">Update now</button>':''}</div><div class="meta">${updMsg}</div><div class="meta" style="margin-top:6px">The app also refreshes itself whenever you open it online. Your data is kept when it updates.</div>`):'')}
+
+function pgGrow(){
+ const t=today(),G=S.gr,GM=[['eng','English communication (min)'],['tech','Technical skills (min)'],['rd','Reading (min)']],dv=(d,k)=>+(G.day[d]&&G.day[d][k])||0;
+ const wk=last7().reduce((s,d)=>s+GM.reduce((u,[k])=>u+dv(d,k),0),0);
+ const c1=card('Daily progress',GM.map(([k,n])=>`<div class="row"><span class="t">${n}${pb(dv(t,k),+G.g[k],0)}</span>${bi('gr.day.'+t+'.'+k,'today','number','style="flex:none;width:72px"')}<span class="meta">of</span>${bi('gr.g.'+k,'goal','number','style="flex:none;width:72px"')}</div>`).join('')+`<div class="meta" style="margin-top:6px">Last 7 days: ${wk} minutes of practice</div>`);
+ const pr=(p,arr,none)=>arr.length?arr.map((x,i)=>{const bk=p==='gr.books',m=bk?+x.tp||0:100;return `<div class="row" style="align-items:flex-start"><span class="t"><b>${esc(x.t)}</b> <span class="meta">${bk?x.p+' / '+m+' pages':Math.round(x.p)+'%'}</span>${pb(x.p,m,0)}</span><span class="mini"><button data-a="inc" data-k="${p}.${i}.p" data-n="10" data-m="${m}">+10</button></span>${gdb(p,i)}</div>`}).join(''):empty(none);
+ return c1+card('Books',gf('gr.books','bk')+pr('gr.books',G.books,'Add the book you are reading.'))+card('Courses',gf('gr.co','co')+pr('gr.co',G.co,'No courses yet.'))+card('Learning goals',gf('gr.lg','lg')+pr('gr.lg',G.lg,'Add goals like \u201cspeak fluently\u201d or a technical certification.'))}
+
+function pgTrip(){
+ const L=S.tr.list,t=today();if(ti>=L.length)ti=0;const T=L[ti];
+ const hdr=card('Trips',(L.length?`<div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px">${L.map((x,i)=>`<button class="chip ${i===ti?'on':''}" data-a="ti" data-i="${i}">${esc(x.n)}</button>`).join('')}</div>`:'')+'<div class="meta" style="margin-bottom:4px">Plan a new trip</div>'+gf('tr.list','trip','Add trip'));
+ if(!T)return hdr;
+ const B='tr.list.'+ti,spt=T.ex.reduce((s,x)=>s+x.a,0),pk=T.pk.filter(x=>x.done).length,dd=T.s?Math.round((new Date(T.s+'T00:00')-new Date(t+'T00:00'))/864e5):null;
+ const c1=card(esc(T.n),`<div style="font-size:17px;font-weight:600;color:var(--acc)">${dd==null?'':dd>0?dd+' days to go':dd===0?'Starts today':'Under way or finished'}</div><div class="meta">${T.s?fmt(T.s):''}${T.e?' \u2192 '+fmt(T.e):''} \u00b7 Budget ${rs(T.b)} \u00b7 Spent ${rs(spt)}</div>${pb(spt,+T.b)}`
+  +lb('Hotel',bi(B+'.ho','Name & address','text'))+lb('Booking details',bi(B+'.hn','Ref, check-in/out','text'))
+  +`<div style="margin-top:8px"><button class="x" data-a="gd" data-k="tr.list" data-i="${ti}" style="font-size:13px">Delete this trip</button></div>`);
+ const c2=card('Trip expenses',gf(B+'.ex','tex')+T.ex.map((x,i)=>`<div class="row"><span class="t">${esc(x.t)}</span><b>${rs(x.a)}</b>${gdb(B+'.ex',i)}</div>`).join(''));
+ const c3=card(`Packing list ${pk}/${T.pk.length}`,gf(B+'.pk','pk')+T.pk.map((x,i)=>`<div class="row ${x.done?'done':''}"><button class="chk ${x.done?'on':''}" data-a="tgl" data-k="${B}.pk.${i}.done" aria-label="toggle">${x.done?'\u2713':''}</button><span class="t">${esc(x.t)}</span>${gdb(B+'.pk',i)}</div>`).join(''));
+ const c4=card('Tickets',gf(B+'.tk','tk')+T.tk.map((x,i)=>`<div class="row"><span class="t">${esc(x.t)}<div class="meta">${x.d?fmt(x.d):''}${x.n?' \u00b7 '+esc(x.n):''}</div></span>${gdb(B+'.tk',i)}</div>`).join(''));
+ const c5=card('Itinerary',gf(B+'.it','it')+T.it.map((x,i)=>({...x,i})).sort((a,b)=>a.d>b.d?1:-1).map(x=>`<div class="row"><span class="when" style="width:62px">${fmt(x.d)}</span><span class="t">${esc(x.t)}</span>${gdb(B+'.it',x.i)}</div>`).join(''));
+ const c6=card('Travel reminders',gf(B+'.rm','rm')+T.rm.map((x,i)=>({...x,i})).sort((a,b)=>a.d>b.d?1:-1).map(x=>`<div class="row"><span class="when ${x.d<t?'over':''}">${wh(x.d)}</span><span class="t">${esc(x.t)}</span>${gdb(B+'.rm',x.i)}</div>`).join(''));
+ return hdr+c1+c2+c3+c4+c5+c6}
+
+function nxt(x){const r=x.r==='Auto'?(x.ty==='Birthday'||x.ty==='Anniversary'?'Yearly':x.ty==='Bill'?'Monthly':'Once'):x.r,o=new Date(x.d+'T00:00'),n=new Date(today()+'T00:00');
+ if(r==='Once')return[o,r];let c=new Date(n.getFullYear(),r==='Yearly'?o.getMonth():n.getMonth(),o.getDate());
+ if(c<n)c=r==='Yearly'?new Date(n.getFullYear()+1,o.getMonth(),o.getDate()):new Date(n.getFullYear(),n.getMonth()+1,o.getDate());return[c,r]}
+function pgDates(){
+ const n0=new Date(today()+'T00:00'),it=[];
+ S.dates.forEach((x,i)=>it.push({...x,i}));
+ S.docs.filter(x=>x.e).forEach(x=>it.push({t:x.t,ty:'Renewal',d:x.e,r:'Once',ro:'Documents'}));
+ S.hl.ap.forEach(x=>it.push({t:x.t,ty:'Appointment',d:x.d,r:'Once',ro:'Health'}));
+ S.tr.list.forEach(T=>{if(T.s)it.push({t:T.n+' starts',ty:'Other',d:T.s,r:'Once',ro:'Travel'});T.rm.forEach(r=>it.push({t:r.t,ty:'Other',d:r.d,r:'Once',ro:'Travel'}))});
+ S.rem.filter(x=>x.d&&!x.done).forEach(x=>it.push({t:x.t,ty:'Other',d:x.d,r:'Once',ro:'Reminders'}));
+ const L=it.map(x=>{const[c,r]=nxt(x);return{...x,c,days:Math.round((c-n0)/864e5),yrs:r==='Yearly'?c.getFullYear()-new Date(x.d+'T00:00').getFullYear():0}}).filter(x=>!(x.ro&&x.days<-30)&&(dtf==='All'||x.ty===dtf)).sort((a,b)=>a.days-b.days);
+ const wk=L.filter(x=>x.days>=0&&x.days<=7).length,od=L.filter(x=>x.days<0).length;
+ return card('Add a date',gf('dates','dt')+'<div class="meta">Auto repeats birthdays and anniversaries yearly, and bills monthly. Document renewals, health appointments, trip dates and dated reminders from other pages appear below automatically.</div>')
+ +card('Coming up',`<div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px">${['All',...DT].map(c=>`<button class="chip ${c===dtf?'on':''}" data-a="dtf" data-i="${c}">${c}</button>`).join('')}</div><div class="meta" style="margin-bottom:6px">${wk} in the next 7 days${od?' \u00b7 '+od+' overdue':''}</div>`
+  +(L.slice(0,25).map(x=>`<div class="row"><span class="when ${x.days<0?'over':''}">${x.days<0?-x.days+'d overdue':x.days===0?'Today':x.days===1?'Tomorrow':'in '+x.days+'d'}</span><span class="t">${esc(x.t)}<span class="tag">${x.ty}</span><div class="meta">${fmt(ymd(x.c))}${x.yrs>0?' \u00b7 '+x.yrs+' yrs':''}${x.ro?' \u00b7 from '+x.ro:''}</div></span>${x.ro?'':gdb('dates',x.i)}</div>`).join('')||empty('Nothing here yet.')),'wide')}
+
+function pgGlance(){const t=today(),I=S.isl,Q=I.q,qd=Q.log[t]||0,rt=S.rem.filter(x=>x.d?(x.d<=t&&(!x.done||x.d===t)):!x.done),cp=[[S.prio.filter(x=>x.done).length,S.prio.length],[S.habits.filter(x=>x.days[t]).length,S.habits.length],[rt.filter(x=>x.done).length,rt.length],[Math.min(qd,Q.goal),Q.goal]].filter(c=>c[1]>0),pct=Math.round(cp.reduce((s,c)=>s+c[0]/c[1],0)/cp.length*100);
+ const tk=S.prio.map((x,i)=>({...x,i})).filter(x=>!x.done).slice(0,3);
+ const up=[...S.ev.filter(e=>e.d>=t).map(e=>({d:e.d,t:e.t})),...S.rem.filter(r=>!r.done&&r.d>t).map(r=>({d:r.d,t:r.t}))].sort((a,b)=>a.d>b.d?1:-1).slice(0,3);
+ return card('Right now',`<div class='ring'><svg viewBox='0 0 80 80' width='96' height='96' role='img' aria-label='${pct}% done'><circle cx='40' cy='40' r='34' fill='none' stroke='var(--line)' stroke-width='8'/><circle cx='40' cy='40' r='34' fill='none' stroke='var(--acc)' stroke-width='8' stroke-linecap='round' stroke-dasharray='${pct*2.136} 213.6' transform='rotate(-90 40 40)'/><text x='40' y='46' text-anchor='middle' font-size='18' font-weight='600' fill='var(--ink)'>${pct}%</text></svg><div class='cmp'><div style='font-size:15px;color:var(--ink)'><b id='nextp2'></b></div><div>${S.habits.filter(x=>x.days[t]).length}/${S.habits.length} habits today</div><div>${rt.filter(x=>!x.done).length} reminders open</div></div></div>`)+card('Next tasks',tk.length?tk.map(x=>`<div class='row'>${chk(false,'tog','prio',x.i)}<span class='t'>${esc(x.t)}</span></div>`).join(''):empty(S.prio.length?'All priorities done.':'Add priorities on the My Life tab.'))+card('Coming up',up.length?up.map(x=>`<div class='row'><span class='when'>${dl(x.d)}</span><span class='t'>${esc(x.t)}</span></div>`).join(''):empty('Nothing coming up.'))}
+const TT={glance:'Today',money:'Salary & Savings Manager',health:'Personal Health Tracker',docs:'Personal Document Manager',grow:'Personal Growth Tracker',trip:'Travel Planner',dates:'Important Dates & Reminders'};
+function renderX(){$('ubar').innerHTML=newV?`<div class="c" style="margin-bottom:12px;display:flex;gap:10px;align-items:center"><span class="t" style="flex:1">Update ${esc(newV)} is available.</span><button class="b" data-a="applyu">Update now</button></div>`:'';const f={glance:pgGlance,money:pgMoney,health:pgHealth,docs:pgDocs,grow:pgGrow,trip:pgTrip,dates:pgDates}[pg];if(!f){$('pgx').innerHTML='';return}$('hi').textContent=TT[pg];$('pgx').innerHTML=f();updNext()}
+document.addEventListener('change',e=>{const p=e.target.dataset&&e.target.dataset.p;if(!p)return;const v=e.target.value;set(p,e.target.type==='number'?(v===''?'':+v):v);save();render()});
+document.addEventListener('keydown',e=>{const i=e.target.id;if(e.key==='Enter'&&i&&i.slice(0,2)==='g:'){const b=e.target.closest('.add').querySelector('button');if(b)b.click()}});
+const IS_APP=!!document.querySelector('link[rel=manifest]'),APP_V=(document.querySelector('meta[name=app-version]')||{}).content||'';
+let newV='',updMsg='';
+async function chkUpd(m){const p=newV;try{const t=await(await fetch('index.html',{cache:'no-store'})).text(),x=t.match(/name="app-version" content="([^"]+)"/);if(x&&x[1]!==APP_V){newV=x[1];updMsg='Version '+x[1]+' is available.'}else if(m)updMsg='You have the latest version.'}catch(e){if(m)updMsg='Could not check. Are you online?'}if(m||newV!==p)render()}
+if(IS_APP){setTimeout(()=>chkUpd(0),3000);document.addEventListener('visibilitychange',()=>{if(!document.hidden)chkUpd(0)})}
+function restoreText(t){try{const o=JSON.parse(t);if(!o||!o.isl)throw 0;S=o;initX();bkText='';bkMsg='Backup restored.'}catch(e){bkMsg='That does not look like a valid backup.'}save();render()}
+document.addEventListener('change',e=>{if(e.target.id==='bkfile'&&e.target.files[0]){const r=new FileReader();r.onload=()=>restoreText(r.result);r.readAsText(e.target.files[0])}});
+render();
+</script>
+<script>if("serviceWorker" in navigator)addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}))</script>
+</body>
+</html>
